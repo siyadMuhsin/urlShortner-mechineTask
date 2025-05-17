@@ -23,12 +23,13 @@ try {
     if(!decode){
         this.sendResponse(res,{ok:false,msg:" Invalid token payload"},HttpStatus.BAD_REQUEST)
     }
-    const newAccessToken=this.generateAccessToken(decode)
-    const newRefreshToken=this.generateRefreshToken(decode)
+    const newAccessToken=this.generateAccessToken(decode.userId)
+    const newRefreshToken=this.generateRefreshToken(decode.userId)
     this.setAccessTokenCookie(res,newAccessToken)
     this.setRefreshTokenCookie(res,newRefreshToken)
     this.sendResponse(res,{ok:true},HttpStatus.OK)
 }catch(error){
+    console.error("Error from refreshing Token",error)
     const err= error as Error
     this.sendResponse(res,{msg:err.message||"Invalid refresh token"},HttpStatus.FORBIDDEN)
 
@@ -65,10 +66,10 @@ private tokenVerify(token:string,secret:string):Promise<any>{
         });
     }
        private generateAccessToken(userId: string): string {
-        return jwt.sign(userId , process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" });
+        return jwt.sign({userId} , process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" });
       }
     
       private generateRefreshToken(userId: string): string {
-        return jwt.sign(userId, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" });
+        return jwt.sign({userId}, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" });
       }
 }

@@ -51,8 +51,6 @@ export class AuthMiddleware implements IAuthMiddleware {
   private tokenVerify(token: string, secret: string): Promise<JwtPayload > {
     return new Promise((resolve, reject) => {
       jwt.verify(token, secret, (err, decoded) => {
-        console.log("Andi",decoded);
-        
         if (err) {
           return reject(err);
         }

@@ -7,7 +7,7 @@ const urlRoute=express.Router()
 const urlController=container.get<IUrlController>(TYPES.UrlController)
 const authMiddleware=container.get<IAuthMiddleware>(TYPES.AuthMiddleware)
 urlRoute.post('/shorten',authMiddleware.verifyToken.bind(authMiddleware),urlController.createShortUrl.bind(urlController))
-urlRoute.get('/:shortId',authMiddleware.verifyToken.bind(authMiddleware),urlController.redirectUrl.bind(urlController))
+urlRoute.get('/:shortId',urlController.redirectUrl.bind(urlController))
 urlRoute.get('/',authMiddleware.verifyToken.bind(authMiddleware),urlController.getUrls.bind(urlController))
 urlRoute.delete('/:urlId',urlController.deleteUrl.bind(urlController))
 function test(){
