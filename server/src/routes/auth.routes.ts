@@ -15,6 +15,7 @@ router.post('/signup',validate(userSchema),authController.signup.bind(authContro
 router.post('/login',validate(loginSchema),authController.login.bind(authController))
 router.post('/logout',authController.logout.bind(authController))
 router.post('/refresh',tokenController.refreshToken.bind(tokenController))
+router.get('/me',authmiddleware.verifyToken.bind(authmiddleware),authController.getCorrentUser.bind(authController))
 function test(){
     console.log("working")
 }

@@ -3,13 +3,17 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { HttpStatus } from "../types/httpStatus";
 import { IAuthMiddleware } from "../interfaces/IMiddlerwares";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-
 export interface AuthRequest extends Request {
-  user?: JwtPayload | string;
+  user?: any;
 }
 
-export class AuthMiddleware implements IAuthMiddleware{
+export class AuthMiddleware implements IAuthMiddleware {
+  private _accessTokenSecret: string;
+
+  constructor() {
+    this._accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
+  }
+
   async verifyToken(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const token = this.getTokenFromRequest(req);
@@ -17,15 +21,22 @@ export class AuthMiddleware implements IAuthMiddleware{
       if (!token) {
         this.sendResponse(res, { msg: "Unauthorized: No token provided" }, HttpStatus.UNAUTHORIZED);
         return;
-      }
+      } 
 
-      const decoded = await this.tokenVerify(token, JWT_SECRET);
-      req.user = decoded;
-      next();
+      const decoded = await this.tokenVerify(token, this._accessTokenSecret);
+      console.log("Decode:",decoded);
       
-    } catch (error) {
+      req.user = decoded.userId;
+      next();
+
+    } catch (error: any) {
       console.error("Token verification error:", error);
-      this.sendResponse(res, { msg: "Invalid or expired token" }, HttpStatus.UNAUTHORIZED);
+
+      if (error.name === "TokenExpiredError") {
+        this.sendResponse(res, { msg: "Token expired" }, HttpStatus.UNAUTHORIZED);
+      } else {
+        this.sendResponse(res, { msg: "Invalid token" }, HttpStatus.UNAUTHORIZED);
+      }
     }
   }
 
@@ -37,10 +48,14 @@ export class AuthMiddleware implements IAuthMiddleware{
     res.status(status).json(data);
   }
 
-  private tokenVerify(token: string, secret: string): Promise<JwtPayload | string> {
+  private tokenVerify(token: string, secret: string): Promise<JwtPayload > {
     return new Promise((resolve, reject) => {
       jwt.verify(token, secret, (err, decoded) => {
-        if (err) return reject(err);
+        console.log("Andi",decoded);
+        
+        if (err) {
+          return reject(err);
+        }
         resolve(decoded as JwtPayload);
       });
     });

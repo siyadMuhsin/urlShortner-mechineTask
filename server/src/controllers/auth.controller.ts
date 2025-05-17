@@ -63,7 +63,6 @@ if (!passwordRegex.test(password)) {
         this.sendResponse(res,{ok:false,message:"Invalid email format"},HttpStatus.BAD_REQUEST)
         return
     }
-
     const result= await this._authService.login(email,password)
     if(result.ok && result.accessToken && result.refreshToken ){
         this.setAuthCookies(res,result.accessToken,result.refreshToken)
@@ -79,7 +78,7 @@ if (!passwordRegex.test(password)) {
 
   async logout (req:AuthRequest,res:Response):Promise<void>{
     try {
-      const user= req?.user
+      const userId= req?.user
       
         res.clearCookie('accessToken',{
           httpOnly:true,
@@ -100,6 +99,20 @@ if (!passwordRegex.test(password)) {
       this.sendResponse(res,{msg:err.message||"Internal server error"},HttpStatus.SERVER_ERROR)
     }
 
+  }
+
+  async getCorrentUser(req:AuthRequest,res:Response):Promise<void>{
+    try {
+      const userId=req.user as string
+      console.log(userId);
+      // return
+      const result=await this._authService.getUser(userId)
+      this.sendResponse(res,result,HttpStatus.OK)
+    } catch (error) {
+      const err=error as Error
+      this.sendResponse(res,{msg:err.message},HttpStatus.SERVER_ERROR)
+      
+    }
   }
 
   private sendResponse(res: Response, data: any, status: HttpStatus): void {

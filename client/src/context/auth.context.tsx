@@ -1,10 +1,13 @@
-import React, { createContext, useState, useContext, type ReactNode, } from "react";
+import React, { createContext, useState, useContext, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import type { IUser } from "../interface/IUser";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: () => void;
+  user: Partial<IUser> | null;
+  login: (userData: Partial<IUser>) => void;
   logout: () => void;
+  setUser: (userData: Partial<IUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,20 +22,23 @@ export const useAuth = (): AuthContextType => {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<Partial<IUser> | null>(null);
   const navigate = useNavigate();
 
-  const login = () => {
+  const login = (userData: Partial<IUser>) => {
     setIsAuthenticated(true);
+    setUser(userData);
     navigate("/");
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUser(null);
     navigate("/auth");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

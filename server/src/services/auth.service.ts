@@ -17,7 +17,7 @@ export class AuthService implements IAuthServices {
     if (existingUser) {
       return { ok: false, message: "User already exists" };
     }
-    console.log(username);
+
     
     const existingUsername = await this._userRepository.findOne({ username });
     console.log(existingUsername)
@@ -29,7 +29,7 @@ export class AuthService implements IAuthServices {
     return { ok: true, message: "User signed up successfully" };
   }
 
-  async login(email: string, password: string): Promise<{ ok: boolean; message: string ,accessToken?:string,refreshToken?:string,user?:IUser}> {
+  async login(email: string, password: string): Promise<{ ok: boolean; message: string ,accessToken?:string,refreshToken?:string,user?:Partial<IUser>}> {
     try {
       const existingUser = await this._userRepository.findByEmail(email);
       if (!existingUser) {
@@ -39,16 +39,34 @@ export class AuthService implements IAuthServices {
       if (!isMatch) {
         return { ok: false, message: "Invalid email or password" };
       }
+      const manipulateUser:Partial<IUser>={}
+      manipulateUser.username=existingUser.username
+      manipulateUser.email=existingUser.email
       return { 
         ok: true,
          message: "User login successfully",
          accessToken:this.generateAccessToken(existingUser._id),
          refreshToken:this.generateRefreshToken(existingUser._id),
-         user:existingUser
+         user:manipulateUser
         };
     } catch (error) {
       console.error("Error during login:", error);
       return { ok: false, message: "Login failed" };
+    }
+  }
+  async getUser(userId:string):Promise<{ok:boolean,msg:string,user?:Partial<IUser>}>{
+    try {
+      const user= await this._userRepository.findById(userId)
+      if(user){
+        const manipulateUser:Partial<IUser>={}
+        manipulateUser.username=user.username
+        manipulateUser.email=user.email
+        return {ok:true,msg:"user fetching success",user:manipulateUser}
+      }
+      throw new Error("User not found")
+    } catch (error) {
+      const err=error as Error
+      throw new Error(err.message)
     }
   }
 
@@ -56,7 +74,7 @@ export class AuthService implements IAuthServices {
     return await bcrypt.hash(password, 10);
   }
    private generateAccessToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" });
+    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "1h" });
   }
 
   private generateRefreshToken(userId: string): string {

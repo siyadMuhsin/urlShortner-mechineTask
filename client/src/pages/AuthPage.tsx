@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, registerUser } from "../services/auth.services";
+import { loginUser, registerUser } from "../services/auth.service";
 import { AuthToggle } from "../components/AuthToggle";
 import { useAuth } from "../context/auth.context";
 
@@ -26,7 +26,7 @@ const {login} =useAuth()
       if (mode === "login") {
         response = await loginUser(email, password);
         if (response.ok) {
-          login()
+          login(response.user)
           navigate("/");
         } else {
           setError(response.message);

@@ -1,14 +1,14 @@
 import { Request,Response } from "express";
 import { HttpStatus } from "../types/httpStatus";
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv'
 import { ITokenController } from "../interfaces/controller/ITokenController";
+dotenv.config()
 export class TokenController implements ITokenController{
     private _refreshTokenSecret:string;
     constructor(){
         this._refreshTokenSecret=process.env.REFRESH_TOKEN_SECRET as string
     }
-
-
     async refreshToken(req:Request,res:Response):Promise<void>{
 try {
     const oldToken=req.cookies.refreshToken;
@@ -16,6 +16,8 @@ try {
         this.sendResponse(res,{ok:false,msg:"Unauthorized: No refresh token"},HttpStatus.BAD_REQUEST)
     return
     }
+    console.log(oldToken,this._refreshTokenSecret);
+    
     const decode=await this.tokenVerify(oldToken,this._refreshTokenSecret)
     console.log(decode)
     if(!decode){
@@ -63,10 +65,10 @@ private tokenVerify(token:string,secret:string):Promise<any>{
         });
     }
        private generateAccessToken(userId: string): string {
-        return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" });
+        return jwt.sign(userId , process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" });
       }
     
       private generateRefreshToken(userId: string): string {
-        return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" });
+        return jwt.sign(userId, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" });
       }
 }

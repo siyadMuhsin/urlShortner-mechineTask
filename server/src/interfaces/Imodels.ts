@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
     _id:string;
@@ -10,7 +10,7 @@ export interface IUser extends Document {
 }
 
 export interface IUrl extends Document{
-    userId:mongoose.Schema.Types.ObjectId
+userId:Types.ObjectId
     originalUrl:string,
     shortUrl:string
     createdAt:Date

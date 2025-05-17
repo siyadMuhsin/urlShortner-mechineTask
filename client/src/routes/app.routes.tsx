@@ -7,14 +7,14 @@ import { AuthProvider } from "../context/auth.context";
 
 const AppRouter = () => {
   return (
-   <Router>
-    <AuthProvider>
+  //  <Router>
+  //   <AuthProvider>
         <Routes>
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/" element={<ProtectedRoute element={<Home />} />} />
         </Routes>
-    </AuthProvider>
-   </Router>
+  //   </AuthProvider>
+  //  </Router>
     
   )
 }

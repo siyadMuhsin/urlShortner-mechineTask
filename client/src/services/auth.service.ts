@@ -34,6 +34,15 @@ const loguotUser=async()=>{
         throw new Error(error?.response?.data?.message)
     }
 }
+const checkAuth=async()=>{
+    try {
+        const response=await api.get('/auth/me')
+        return response.data
+    } catch (error:any) {
+        throw new Error(error.response.data.message)
+        
+    }
+}
 export {
-    loginUser,registerUser,loguotUser
+    loginUser,registerUser,loguotUser,checkAuth
 }
