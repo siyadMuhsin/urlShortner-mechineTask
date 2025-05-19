@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import { checkAuth } from "../services/auth.service";
 import { useAuth } from "../context/auth.context";

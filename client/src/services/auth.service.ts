@@ -1,6 +1,6 @@
 
 import  api from "../config/axiosConfig"
-import { useAuth } from "../context/auth.context";
+
 
 const loginUser=async(email:string,password:string)=>{
     try {
