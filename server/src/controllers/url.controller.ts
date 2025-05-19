@@ -69,7 +69,7 @@ export class UrlController implements IUrlController{
         return;
       }
 
-      const result = await this._urlService.getUrls('68273ed3fd13cc97e26b4578');
+      const result = await this._urlService.getUrls(userId);
 
       if (result.ok) {
         this.sendResponse(res, { ok: true, msg: result.msg, urls: result.urls }, HttpStatus.OK);
