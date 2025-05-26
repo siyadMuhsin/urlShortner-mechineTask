@@ -12,12 +12,11 @@ export class UrlRepository implements IUrlRepository{
         return await Url.findOne(data)
     }
     async find(data:FilterQuery<IUrl>):Promise<IUrl[]|[]>{
-        return await Url.find(data)
+        return await Url.find(data).sort({createdAt:-1})
     }
     async findByIdAndDelete(urlId: string): Promise<IUrl|null> {
         const id= urlId
         return await Url.findByIdAndDelete(urlId)
-         
     }
 
 }
